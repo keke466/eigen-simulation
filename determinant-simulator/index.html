@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📐 行列式计算器 | 可视化学习工具</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📐</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <header class="floating">
+            <h1><i class="fas fa-calculator"></i> 行列式计算器</h1>
+            <p class="subtitle">通过可视化的方式，直观理解二维向量的行列式及其几何意义</p>
+        </header>
+
+        <!-- 左侧：画布区域 -->
+        <main class="canvas-container">
+            <canvas id="geometry-canvas"></canvas>
+            
+            <div class="canvas-controls mt-20">
+                <button id="btn-reset" class="btn btn-secondary">
+                    <i class="fas fa-redo"></i> 重置向量
+                </button>
+            </div>
+        </main>
+
+        <!-- 右侧：控制面板 -->
+        <aside class="control-panel">
+            <!-- 坐标显示 -->
+            <section class="coordinates-display">
+                <h2 class="section-title"><i class="fas fa-crosshairs"></i> 坐标显示</h2>
+                <div class="vector-display">
+                    <div class="vector-item u-vector">
+                        <div class="vector-label">
+                            <i class="fas fa-arrow-up" style="color: #4cc9f0;"></i>
+                            向量 u (蓝色)
+                        </div>
+                        <div>
+                            x: <span id="u-x" class="coordinate">1.00</span>
+                            y: <span id="u-y" class="coordinate">0.00</span>
+                        </div>
+                    </div>
+                    <div class="vector-item v-vector">
+                        <div class="vector-label">
+                            <i class="fas fa-arrow-up" style="color: #f72585;"></i>
+                            向量 v (红色)
+                        </div>
+                        <div>
+                            x: <span id="v-x" class="coordinate">0.00</span>
+                            y: <span id="v-y" class="coordinate">1.00</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="area-display">
+                    <div class="vector-label">
+                        <i class="fas fa-shapes"></i> 平行四边形面积
+                    </div>
+                    <span id="area-value" class="glow">1.00</span>
+                </div>
+            </section>
+
+            <!-- 公式验证 -->
+            <section class="formula-section">
+                <h2 class="section-title"><i class="fas fa-magic"></i> 公式验证</h2>
+                <div class="formula-input-group">
+                    <input type="text" id="formula-input" placeholder="输入行列式公式，如：det(u, v) = u_x*v_y - u_y*v_x">
+                    <button id="btn-validate" class="btn">
+                        <i class="fas fa-check"></i> 验证
+                    </button>
+                </div>
+                <div id="validation-result">
+                    <!-- 验证结果将动态显示在这里 -->
+                </div>
+            </section>
+
+            <!-- 实验记录 -->
+            <section class="records-section">
+                <h2 class="section-title"><i class="fas fa-clipboard-list"></i> 实验记录</h2>
+                <div class="records-controls">
+                    <button id="btn-record" class="btn btn-success">
+                        <i class="fas fa-save"></i> 记录当前状态
+                    </button>
+                    <button id="btn-clear" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> 清空记录
+                    </button>
+                </div>
+                <table id="record-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>向量 u</th>
+                            <th>向量 v</th>
+                            <th>面积</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="record-table-body">
+                        <!-- 记录将动态添加到这里 -->
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- 挑战系统 -->
+            <section class="challenges-section">
+                <h2 class="section-title"><i class="fas fa-trophy"></i> 挑战任务</h2>
+                <div class="challenge-list">
+                    <div class="challenge-item">
+                        <div class="challenge-status" id="status-2x"></div>
+                        <div class="challenge-text">使平行四边形的面积变为原来的2倍</div>
+                    </div>
+                    <div class="challenge-item">
+                        <div class="challenge-status" id="status-zero"></div>
+                        <div class="challenge-text">使平行四边形的面积变为0</div>
+                    </div>
+                    <div class="challenge-item">
+                        <div class="challenge-status" id="status-negative"></div>
+                        <div class="challenge-text">使平行四边形出现负面积</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 下一幕按钮 -->
+            <div class="text-center mt-20">
+                <button id="btn-next-scene" class="btn" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);">
+                    <i class="fas fa-arrow-right"></i> 进入下一幕：解密行列式
+                </button>
+            </div>
+        </aside>
+    </div>
+
+    <!-- 发现庆祝模态框 -->
+    <div id="discovery-celebration" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="document.getElementById('discovery-celebration').style.display='none'">
+                <i class="fas fa-times"></i>
+            </button>
+            <h2><i class="fas fa-crown"></i> 恭喜发现！</h2>
+            <p>你成功验证了行列式的计算公式！🎉</p>
+            <p>行列式反映了两个向量张成的平行四边形的<b>有向面积</b>。</p>
+            <div class="mt-20">
+                <button class="btn" onclick="document.getElementById('discovery-celebration').style.display='none'">
+                    继续探索
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript 模块 -->
+    <script type="module" src="js/main.js"></script>
+
+    <!-- 调试面板（开发时使用） -->
+    <div id="debug-panel" style="position: fixed; bottom: 10px; right: 10px; background: rgba(0,0,0,0.8); color: white; padding: 10px; border-radius: 5px; font-size: 12px; display: none;">
+        <div>调试模式</div>
+        <div id="debug-info"></div>
+    </div>
+
+    <script>
+        // 简单的调试开关
+        if (location.search.includes('debug')) {
+            document.getElementById('debug-panel').style.display = 'block';
+            window.DEBUG = true;
+        }
+    </script>
+</body>
+</html>
