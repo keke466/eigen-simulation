@@ -1,0 +1,1363 @@
+/* ============================================
+   古典矩阵锁实验室 - 样式文件
+   设计理念：牛皮纸 + 墨水 + 卷轴 + 金属
+   注释：所有样式都添加了说明，方便修改
+   ============================================ */
+
+/* === 基础重置和全局样式 === */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* 古典主题颜色变量 - 方便统一修改 */
+:root {
+    /* 牛皮纸系列 */
+    --parchment-light: #f8f4e9;    /* 浅色牛皮纸 */
+    --parchment-medium: #f5e9d6;   /* 中等牛皮纸 */
+    --parchment-dark: #e8dfca;     /* 深色牛皮纸 */
+    
+    /* 墨水系列 */
+    --ink-black: #2c1810;          /* 浓墨黑 */
+    --ink-brown: #5c4033;          /* 棕褐色墨 */
+    --ink-light: #8b7d6b;          /* 淡墨色 */
+    
+    /* 金属系列 */
+    --bronze: #cd7f32;             /* 青铜色 */
+    --bronze-dark: #8b4513;        /* 深青铜 */
+    --gold: #d4af37;               /* 金色 */
+    --gold-light: #f5d76e;         /* 浅金色 */
+    --silver: #c0c0c0;             /* 银色 */
+    
+    /* 三界主题色 */
+    --realm-forge: #3498db;        /* 锻造界 - 蓝色 */
+    --realm-lock: #e74c3c;         /* 锁界 - 红色 */
+    --realm-truth: #2ecc71;        /* 真理界 - 绿色 */
+    
+    /* 阴影和边框 */
+    --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.1);
+    --shadow-medium: 0 5px 20px rgba(0, 0, 0, 0.15);
+    --shadow-heavy: 0 10px 30px rgba(0, 0, 0, 0.2);
+    --border-classic: 2px solid var(--ink-light);
+    --border-gold: 2px solid var(--gold);
+    
+    /* 古典字体 */
+    --font-title: 'Cinzel', 'Palatino Linotype', serif;
+    --font-body: 'Cormorant Garamond', 'Georgia', serif;
+    --font-math: 'Cambria Math', 'Times New Roman', serif;
+}
+
+/* === 整体页面样式 === */
+body.classic-theme {
+    font-family: var(--font-body);
+    background: 
+        /* 牛皮纸纹理背景 */
+        url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2Y1ZTlkNiIvPgogIDxwYXRoIGQ9Ik0wLDIwIEwxMDAsMjAgTTIwLDAgTDIwLDEwMCBNODAsMCBMODAsMTAwIiBzdHJva2U9IiNlMGQwYzAiIHN0cm9rZS13aWR0aD0iMC41IiBvcGFjaXR5PSIwLjIiLz4KPC9zdmc+') repeat,
+        /* 渐变底色 */
+        linear-gradient(135deg, var(--parchment-medium), var(--parchment-dark));
+    color: var(--ink-black);
+    min-height: 100vh;
+    line-height: 1.6;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* === 古典装饰元素 === */
+
+/* 墨水痕迹装饰 */
+.ink-stains {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.ink-stain {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at center, 
+        rgba(44, 24, 16, 0.1) 0%, 
+        rgba(44, 24, 16, 0.05) 40%, 
+        transparent 70%);
+    filter: blur(10px);
+}
+
+.stain-1 {
+    width: 200px;
+    height: 150px;
+    top: 10%;
+    left: 5%;
+    transform: rotate(-15deg);
+}
+
+.stain-2 {
+    width: 150px;
+    height: 200px;
+    top: 60%;
+    right: 10%;
+    transform: rotate(20deg);
+}
+
+.stain-3 {
+    width: 180px;
+    height: 120px;
+    bottom: 15%;
+    left: 20%;
+    transform: rotate(10deg);
+}
+
+/* 火漆印章 */
+.wax-seal {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 80px;
+    height: 80px;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.seal-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 30% 30%, 
+        var(--gold), 
+        var(--bronze));
+    border-radius: 50%;
+    box-shadow: 
+        var(--shadow-medium),
+        inset 0 0 20px rgba(212, 175, 55, 0.3);
+    border: 3px solid var(--bronze-dark);
+}
+
+.seal-symbol {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--font-math);
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--ink-black);
+    text-shadow: 1px 1px 2px rgba(212, 175, 55, 0.5);
+}
+
+/* === 主容器 === */
+.ancient-container {
+    max-width: 1600px;
+    margin: 20px auto;
+    background: var(--parchment-light);
+    border-radius: 5px;
+    box-shadow: var(--shadow-heavy);
+    position: relative;
+    overflow: hidden;
+    border: var(--border-classic);
+}
+
+/* 卷轴装饰效果 */
+.ancient-container::before,
+.ancient-container::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background: linear-gradient(90deg, 
+        var(--bronze-dark), 
+        var(--bronze), 
+        var(--bronze-dark));
+    z-index: 2;
+}
+
+.ancient-container::before {
+    top: 0;
+    border-bottom: 3px solid var(--ink-black);
+}
+
+.ancient-container::after {
+    bottom: 0;
+    border-top: 3px solid var(--ink-black);
+}
+
+/* === 标题区域 === */
+.classic-header {
+    padding: 30px;
+    background: linear-gradient(135deg, 
+        var(--ink-black), 
+        var(--ink-brown));
+    border-bottom: 5px solid var(--gold);
+    position: relative;
+}
+
+.header-decoration {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+}
+
+/* 卷轴两端装饰 */
+.scroll-end {
+    width: 40px;
+    height: 120px;
+    background: linear-gradient(135deg, 
+        var(--bronze), 
+        var(--bronze-dark));
+    border-radius: 10px;
+    border: 3px solid var(--ink-black);
+    box-shadow: var(--shadow-medium);
+    position: relative;
+}
+
+.scroll-end::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 100px;
+    background: linear-gradient(to bottom, 
+        var(--gold), 
+        var(--bronze));
+    border-radius: 5px;
+}
+
+.title-content {
+    text-align: center;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    border: 2px dashed rgba(212, 175, 55, 0.3);
+}
+
+.main-title {
+    font-family: var(--font-title);
+    font-size: 2.8rem;
+    color: var(--gold);
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.main-title i {
+    font-size: 2.5rem;
+    color: var(--bronze);
+}
+
+.subtitle {
+    font-size: 1.6rem;
+    color: var(--parchment-light);
+    margin-bottom: 10px;
+    font-weight: 300;
+    font-style: italic;
+}
+
+.tagline {
+    font-size: 1.2rem;
+    color: var(--bronze);
+    font-style: italic;
+    border-top: 1px solid rgba(205, 127, 50, 0.5);
+    padding-top: 10px;
+    display: inline-block;
+}
+
+/* === 三界布局 === */
+.three-realms {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    padding: 30px;
+    background: 
+        /* 古典格子纸效果 */
+        linear-gradient(90deg, transparent 24px, rgba(139, 125, 107, 0.1) 24px, rgba(139, 125, 107, 0.1) 25px, transparent 25px),
+        linear-gradient(180deg, transparent 24px, rgba(139, 125, 107, 0.1) 24px, rgba(139, 125, 107, 0.1) 25px, transparent 25px);
+    background-size: 25px 25px;
+    min-height: 600px;
+}
+
+/* 响应式设计：小屏幕时垂直排列 */
+@media (max-width: 1200px) {
+    .three-realms {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* === 界的通用样式 === */
+.realm {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: var(--shadow-medium);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: var(--border-classic);
+    position: relative;
+}
+
+.realm:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-heavy);
+}
+
+/* 界标题 */
+.realm-header {
+    padding: 20px;
+    border-bottom: 3px solid;
+    text-align: center;
+}
+
+/* 左界样式 */
+.realm-left .realm-header {
+    background: linear-gradient(135deg, 
+        rgba(52, 152, 219, 0.1), 
+        rgba(41, 128, 185, 0.1));
+    border-bottom-color: var(--realm-forge);
+}
+
+.realm-left .realm-header h3 {
+    color: var(--realm-forge);
+}
+
+/* 中界样式 */
+.realm-center .realm-header {
+    background: linear-gradient(135deg, 
+        rgba(231, 76, 60, 0.1), 
+        rgba(192, 57, 43, 0.1));
+    border-bottom-color: var(--realm-lock);
+}
+
+.realm-center .realm-header h3 {
+    color: var(--realm-lock);
+}
+
+/* 右界样式 */
+.realm-right .realm-header {
+    background: linear-gradient(135deg, 
+        rgba(46, 204, 113, 0.1), 
+        rgba(39, 174, 96, 0.1));
+    border-bottom-color: var(--realm-truth);
+}
+
+.realm-right .realm-header h3 {
+    color: var(--realm-truth);
+}
+
+.realm-header h3 {
+    font-family: var(--font-title);
+    font-size: 1.8rem;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.realm-subtitle {
+    font-size: 1rem;
+    color: var(--ink-light);
+    font-style: italic;
+}
+
+.realm-content {
+    padding: 25px;
+}
+
+/* === 左界：锻造密钥 === */
+
+/* 直角坐标系 */
+.coordinate-forge {
+    position: relative;
+    margin-bottom: 20px;
+    border: var(--border-classic);
+    border-radius: 10px;
+    overflow: hidden;
+    background: white;
+}
+
+#forgeCanvas {
+    width: 100%;
+    height: 350px;
+    display: block;
+}
+
+/* 罗盘装饰 */
+.compass-rose {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+}
+
+.compass-n, .compass-e, .compass-s, .compass-w {
+    position: absolute;
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--realm-forge);
+    background: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--realm-forge);
+}
+
+.compass-n { top: -10px; left: 50%; transform: translateX(-50%); }
+.compass-e { top: 50%; right: -10px; transform: translateY(-50%); }
+.compass-s { bottom: -10px; left: 50%; transform: translateX(-50%); }
+.compass-w { top: 50%; left: -10px; transform: translateY(-50%); }
+
+/* 向量控制区 */
+.vector-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.control-group label {
+    min-width: 80px;
+    color: var(--realm-forge);
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* 古典滑块 */
+.classic-slider {
+    flex: 1;
+    height: 12px;
+    -webkit-appearance: none;
+    background: linear-gradient(to right, 
+        var(--realm-forge), 
+        var(--bronze));
+    border-radius: 6px;
+    outline: none;
+    border: 2px solid var(--ink-light);
+}
+
+.classic-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--gold);
+    cursor: pointer;
+    border: 3px solid var(--bronze-dark);
+    box-shadow: var(--shadow-light);
+    transition: all 0.2s ease;
+}
+
+.classic-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 10px var(--gold);
+}
+
+.slider-value {
+    min-width: 40px;
+    text-align: center;
+    font-weight: bold;
+    color: var(--realm-forge);
+    font-family: var(--font-math);
+}
+
+/* 向量信息卡片 */
+.vector-info-card {
+    background: rgba(52, 152, 219, 0.05);
+    padding: 20px;
+    border-radius: 10px;
+    border: 2px solid var(--realm-forge);
+}
+
+.vector-info-card h4 {
+    margin-bottom: 15px;
+    color: var(--realm-forge);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 2px solid var(--realm-forge);
+    padding-bottom: 5px;
+}
+
+.info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--ink-light);
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    color: var(--ink-brown);
+    font-weight: bold;
+}
+
+.info-value {
+    font-family: var(--font-math);
+    font-weight: bold;
+    color: var(--realm-forge);
+}
+
+/* 古典按钮 */
+.classic-btn {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, 
+        var(--bronze), 
+        var(--bronze-dark));
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-family: var(--font-title);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    border: 2px solid var(--bronze-dark);
+    box-shadow: 0 4px 0 var(--bronze-dark);
+}
+
+.classic-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 var(--bronze-dark);
+    background: linear-gradient(135deg, 
+        var(--gold), 
+        var(--bronze));
+}
+
+.classic-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 var(--bronze-dark);
+}
+
+.forge-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+/* === 中界：矩阵心锁（方案C实现） === */
+
+.ancient-padlock {
+    position: relative;
+    width: 100%;
+    height: 350px;
+    margin-bottom: 20px;
+    background: 
+        /* 金属质感背景 */
+        radial-gradient(circle at 30% 30%, 
+            rgba(205, 127, 50, 0.1), 
+            transparent 50%),
+        radial-gradient(circle at 70% 70%, 
+            rgba(212, 175, 55, 0.1), 
+            transparent 50%),
+        /* 古典几何图案 */
+        linear-gradient(45deg, 
+            transparent 49%, 
+            rgba(139, 125, 107, 0.1) 49%, 
+            rgba(139, 125, 107, 0.1) 51%, 
+            transparent 51%),
+        linear-gradient(-45deg, 
+            transparent 49%, 
+            rgba(139, 125, 107, 0.1) 49%, 
+            rgba(139, 125, 107, 0.1) 51%, 
+            transparent 51%);
+    background-size: 20px 20px;
+    border-radius: 15px;
+    border: 3px solid var(--bronze);
+    box-shadow: 
+        inset 0 0 30px rgba(205, 127, 50, 0.2),
+        var(--shadow-medium);
+}
+
+/* 锁的虚影轮廓 */
+.lock-silhouette {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.2;
+    filter: blur(2px);
+    z-index: 1;
+}
+
+.lock-body {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 200px;
+    height: 150px;
+    background: linear-gradient(135deg, 
+        var(--bronze), 
+        var(--ink-black));
+    border-radius: 20px;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.lock-arch {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 220px;
+    height: 100px;
+    border: 15px solid var(--bronze);
+    border-bottom: none;
+    border-radius: 110px 110px 0 0;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+/* 矩阵显示区域（浮现在锁面上） */
+.matrix-on-lock {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 
+        0 0 30px rgba(0, 0, 0, 0.3),
+        inset 0 0 0 3px var(--gold);
+    border: 3px solid var(--bronze-dark);
+}
+
+.ancient-matrix {
+    border-collapse: separate;
+    border-spacing: 15px;
+}
+
+.ancient-matrix tr {
+    display: flex;
+    gap: 15px;
+}
+
+.ancient-matrix td {
+    position: relative;
+}
+
+.matrix-input {
+    width: 80px;
+    height: 80px;
+    background: white;
+    border: 3px solid var(--bronze);
+    border-radius: 10px;
+    color: var(--ink-black);
+    font-family: var(--font-math);
+    font-size: 1.5rem;
+    text-align: center;
+    padding: 10px;
+    box-shadow: 
+        inset 0 2px 5px rgba(0, 0, 0, 0.1),
+        0 3px 5px rgba(205, 127, 50, 0.3);
+    transition: all 0.3s ease;
+}
+
+.matrix-input:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 
+        inset 0 2px 5px rgba(0, 0, 0, 0.1),
+        0 0 15px rgba(212, 175, 55, 0.5);
+    transform: scale(1.05);
+}
+
+.matrix-input:hover {
+    border-color: var(--gold-light);
+}
+
+/* 锁的状态指示系统 */
+.lock-indicators {
+    position: absolute;
+    bottom: 30px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    z-index: 3;
+}
+
+/* 油灯式指示灯 */
+.oil-lamp-indicator {
+    position: relative;
+    width: 60px;
+    height: 80px;
+}
+
+.lamp-base {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 20px;
+    background: linear-gradient(135deg, 
+        var(--bronze), 
+        var(--bronze-dark));
+    border-radius: 10px 10px 5px 5px;
+    border: 2px solid var(--ink-black);
+}
+
+.lamp-glass {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 5px;
+    border: 2px solid var(--silver);
+    overflow: hidden;
+}
+
+.lamp-flame {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 15px;
+    height: 25px;
+    background: linear-gradient(to top, 
+        #ff6b6b, 
+        #feca57, 
+        #ff9f43);
+    border-radius: 50% 50% 20% 20%;
+    box-shadow: 0 0 10px #ff6b6b;
+    transition: all 0.5s ease;
+}
+
+/* 解锁时的火焰效果 */
+.lamp-flame.unlocked {
+    background: linear-gradient(to top, 
+        #1dd1a1, 
+        #10ac84, 
+        #00d2d3);
+    box-shadow: 0 0 15px #1dd1a1;
+    animation: flame-flicker 1.5s ease-in-out infinite;
+}
+
+.lamp-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: radial-gradient(circle, 
+        rgba(255, 107, 107, 0.3), 
+        transparent 70%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.lamp-flame.unlocked ~ .lamp-glow {
+    background: radial-gradient(circle, 
+        rgba(29, 209, 161, 0.3), 
+        transparent 70%);
+    opacity: 1;
+}
+
+/* 钥匙孔装饰 */
+.keyhole-decoration {
+    position: relative;
+}
+
+.keyhole {
+    width: 20px;
+    height: 30px;
+    background: linear-gradient(135deg, 
+        var(--ink-black), 
+        var(--ink-brown));
+    border-radius: 10px;
+    border: 2px solid var(--gold);
+    box-shadow: 
+        inset 0 0 5px rgba(255, 255, 255, 0.2),
+        0 0 10px rgba(212, 175, 55, 0.5);
+}
+
+.status-text {
+    color: var(--ink-brown);
+    font-weight: bold;
+    font-size: 1.1rem;
+    min-width: 120px;
+    text-align: center;
+}
+
+/* 金属光泽效果 */
+.metal-highlight {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    height: 5px;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.5), 
+        transparent);
+    border-radius: 5px;
+    z-index: 1;
+}
+
+/* 锁的控制面板 */
+.lock-control-panel {
+    background: rgba(231, 76, 60, 0.05);
+    padding: 20px;
+    border-radius: 15px;
+    border: 2px solid var(--realm-lock);
+}
+
+.lock-control-panel h4 {
+    margin-bottom: 15px;
+    color: var(--realm-lock);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* 预设按钮 */
+.preset-buttons {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.preset-btn {
+    padding: 10px;
+    background: linear-gradient(135deg, 
+        var(--parchment-light), 
+        var(--parchment-dark));
+    border: 2px solid var(--ink-light);
+    border-radius: 10px;
+    color: var(--ink-black);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.preset-btn:hover {
+    background: linear-gradient(135deg, 
+        var(--gold-light), 
+        var(--gold));
+    border-color: var(--bronze);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-light);
+}
+
+.matrix-icon {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.btn-label {
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+/* 特征信息显示 */
+.eigen-info {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid var(--ink-light);
+}
+
+.lambda-display {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--ink-light);
+}
+
+.lambda-display:last-child {
+    border-bottom: none;
+}
+
+.lambda-label {
+    color: var(--ink-brown);
+    font-weight: bold;
+}
+
+.lambda-value {
+    font-family: var(--font-math);
+    font-weight: bold;
+    color: var(--realm-lock);
+    min-width: 60px;
+    text-align: right;
+}
+
+/* === 右界：真理映射 === */
+
+.truth-mapping {
+    position: relative;
+    margin-bottom: 20px;
+    border: var(--border-classic);
+    border-radius: 10px;
+    overflow: hidden;
+    background: white;
+}
+
+#truthCanvas {
+    width: 100%;
+    height: 350px;
+    display: block;
+}
+
+/* λ符号显示 */
+.lambda-revelation {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    z-index: 2;
+}
+
+.lambda-revelation.visible {
+    opacity: 1;
+}
+
+.lambda-symbol {
+    font-family: var(--font-math);
+    font-size: 5rem;
+    font-weight: bold;
+    color: var(--gold);
+    text-shadow: 
+        0 0 20px rgba(212, 175, 55, 0.7),
+        0 0 40px rgba(212, 175, 55, 0.5);
+    animation: symbol-glow 2s ease-in-out infinite alternate;
+}
+
+.lambda-value-display {
+    font-size: 2rem;
+    color: white;
+    margin-top: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: 2px solid var(--gold);
+    font-family: var(--font-math);
+    font-weight: bold;
+}
+
+/* 特征向量动画容器 */
+.eigen-animation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* 方程显示区 */
+.equation-display {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+    .equation-display {
+        grid-template-columns: 1fr;
+    }
+}
+
+.equation-card {
+    background: rgba(46, 204, 113, 0.05);
+    padding: 20px;
+    border-radius: 10px;
+    border: 2px solid var(--realm-truth);
+}
+
+.equation-card h4 {
+    margin-bottom: 15px;
+    color: var(--realm-truth);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 2px solid var(--realm-truth);
+    padding-bottom: 5px;
+}
+
+.equation-line {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border: 1px solid var(--ink-light);
+}
+
+.equation-line:last-child {
+    margin-bottom: 0;
+}
+
+.math-symbol {
+    font-family: var(--font-math);
+    font-style: italic;
+    font-size: 1.2rem;
+    color: var(--ink-black);
+    min-width: 60px;
+}
+
+.equals {
+    font-weight: bold;
+    color: var(--realm-truth);
+    font-size: 1.2rem;
+}
+
+.result {
+    font-family: var(--font-math);
+    font-weight: bold;
+    color: var(--realm-truth);
+    min-width: 120px;
+    text-align: center;
+    background: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: 1px solid var(--ink-light);
+}
+
+.eigen-line {
+    display: none;
+    border: 2px solid var(--gold);
+    background: linear-gradient(135deg, 
+        rgba(212, 175, 55, 0.1), 
+        rgba(205, 127, 50, 0.1));
+}
+
+/* 特征值意义解释 */
+.meaning-explanation {
+    background: rgba(46, 204, 113, 0.05);
+    padding: 20px;
+    border-radius: 10px;
+    border: 2px solid var(--realm-truth);
+}
+
+.meaning-explanation h4 {
+    margin-bottom: 15px;
+    color: var(--realm-truth);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 2px solid var(--realm-truth);
+    padding-bottom: 5px;
+}
+
+.meaning-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.meaning-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: white;
+    border-radius: 10px;
+    border: 2px solid;
+    transition: all 0.3s ease;
+}
+
+.meaning-item:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-light);
+}
+
+/* 不同类型的边框颜色 */
+.stretch { border-color: #2ecc71; }
+.compress { border-color: #3498db; }
+.reverse { border-color: #e74c3c; }
+.identity { border-color: #f39c12; }
+
+.meaning-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+    border: 2px solid;
+}
+
+/* 图标颜色匹配 */
+.stretch .meaning-icon { 
+    background: rgba(46, 204, 113, 0.1); 
+    border-color: #2ecc71;
+    color: #2ecc71;
+}
+.compress .meaning-icon { 
+    background: rgba(52, 152, 219, 0.1); 
+    border-color: #3498db;
+    color: #3498db;
+}
+.reverse .meaning-icon { 
+    background: rgba(231, 76, 60, 0.1); 
+    border-color: #e74c3c;
+    color: #e74c3c;
+}
+.identity .meaning-icon { 
+    background: rgba(243, 156, 18, 0.1); 
+    border-color: #f39c12;
+    color: #f39c12;
+}
+
+.meaning-text {
+    flex: 1;
+}
+
+.meaning-title {
+    font-weight: bold;
+    color: var(--ink-black);
+    margin-bottom: 2px;
+}
+
+.meaning-desc {
+    font-family: var(--font-math);
+    font-size: 0.9rem;
+    color: var(--ink-light);
+}
+
+/* 成功状态显示 */
+.success-revelation {
+    display: none;
+    margin-top: 20px;
+    background: linear-gradient(135deg, 
+        rgba(46, 204, 113, 0.1), 
+        rgba(39, 174, 96, 0.1));
+    border-radius: 15px;
+    border: 3px solid var(--gold);
+    padding: 25px;
+    text-align: center;
+    animation: fadeIn 0.5s ease;
+}
+
+.revelation-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 25px;
+}
+
+.revelation-icon {
+    font-size: 3.5rem;
+    color: var(--gold);
+    animation: spin-slow 3s linear infinite;
+}
+
+.revelation-text h3 {
+    color: var(--realm-truth);
+    margin-bottom: 10px;
+    font-size: 1.8rem;
+}
+
+.revelation-text p {
+    color: var(--ink-brown);
+    margin-bottom: 5px;
+}
+
+.lambda-result {
+    font-size: 1.3rem;
+    color: var(--gold);
+    font-weight: bold;
+    margin: 10px 0;
+    font-family: var(--font-math);
+}
+
+.revelation-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+/* === 底部：发现记录 === */
+.classic-footer {
+    background: linear-gradient(135deg, 
+        var(--ink-brown), 
+        var(--ink-black));
+    padding: 30px;
+    color: var(--parchment-light);
+    border-top: 5px solid var(--gold);
+}
+
+.discovery-archive {
+    margin-bottom: 25px;
+}
+
+.discovery-archive h4 {
+    margin-bottom: 15px;
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.4rem;
+}
+
+.archive-content {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 10px;
+    border: 2px solid var(--bronze);
+    min-height: 120px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.archive-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 80px;
+    color: rgba(255, 255, 255, 0.5);
+    font-style: italic;
+}
+
+.archive-empty i {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.footer-info {
+    text-align: center;
+    border-top: 1px solid rgba(205, 127, 50, 0.3);
+    padding-top: 20px;
+}
+
+.principle-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+.principle-formula {
+    font-family: var(--font-math);
+    font-style: italic;
+    font-weight: bold;
+    color: var(--gold);
+}
+
+.principle-text {
+    color: var(--parchment-light);
+    font-style: italic;
+}
+
+.copyright {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    margin-top: 10px;
+}
+
+/* === 动画定义 === */
+
+/* 火焰闪烁动画 */
+@keyframes flame-flicker {
+    0%, 100% { 
+        transform: translate(-50%, -50%) scale(1); 
+        opacity: 1; 
+    }
+    50% { 
+        transform: translate(-50%, -50%) scale(1.1); 
+        opacity: 0.8; 
+    }
+}
+
+/* λ符号发光动画 */
+@keyframes symbol-glow {
+    from { 
+        text-shadow: 
+            0 0 10px rgba(212, 175, 55, 0.7),
+            0 0 20px rgba(212, 175, 55, 0.5);
+    }
+    to { 
+        text-shadow: 
+            0 0 20px rgba(212, 175, 55, 0.9),
+            0 0 40px rgba(212, 175, 55, 0.7),
+            0 0 60px rgba(212, 175, 55, 0.5);
+    }
+}
+
+/* 淡入动画 */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* 缓慢旋转动画 */
+@keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* === 滚动条样式 === */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(139, 125, 107, 0.1);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, 
+        var(--bronze), 
+        var(--gold));
+    border-radius: 5px;
+    border: 2px solid var(--bronze-dark);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, 
+        var(--gold), 
+        var(--gold-light));
+}

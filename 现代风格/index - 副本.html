@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>矩阵魔法锁实验室 - 特征向量探索</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 标题和说明 -->
+        <header class="header">
+            <h1><i class="fas fa-lock"></i> 矩阵魔法锁实验室</h1>
+            <p class="subtitle">探索特征向量与矩阵变换的神秘世界</p>
+            <p class="philosophy">左实界 · 中法则 · 右虚界</p>
+        </header>
+
+        <!-- 主内容区域 -->
+        <main class="main-content">
+            <!-- 左实界 - 现实操作 -->
+            <section class="realm real-realm" id="realRealm">
+                <div class="realm-header">
+                    <h2><i class="fas fa-globe-americas"></i> 实界 · 现实操作</h2>
+                    <p class="realm-description">你可以在这里操作现实世界的向量</p>
+                </div>
+                
+                <div class="realm-content">
+                    <!-- 向量可视化画布 -->
+                    <div class="vector-canvas-container">
+                        <canvas id="realCanvas" width="400" height="400"></canvas>
+                        <div class="canvas-label">拖拽向量端点以改变方向</div>
+                    </div>
+                    
+                    <!-- 向量控制面板 -->
+                    <div class="control-panel">
+                        <h3><i class="fas fa-sliders-h"></i> 向量控制</h3>
+                        
+                        <div class="vector-inputs">
+                            <div class="input-group">
+                                <label for="vecX">X 分量:</label>
+                                <div class="slider-container">
+                                    <input type="range" id="vecX" min="-100" max="100" value="100" step="1">
+                                    <span class="slider-value" id="vecXValue">100</span>
+                                </div>
+                            </div>
+                            
+                            <div class="input-group">
+                                <label for="vecY">Y 分量:</label>
+                                <div class="slider-container">
+                                    <input type="range" id="vecY" min="-100" max="100" value="0" step="1">
+                                    <span class="slider-value" id="vecYValue">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="vector-info">
+                            <h4><i class="fas fa-info-circle"></i> 向量信息</h4>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <span class="info-label">当前向量:</span>
+                                    <span class="info-value" id="currentVectorDisplay">[1.00, 0.00]</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">向量长度:</span>
+                                    <span class="info-value" id="vectorLength">1.00</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">与X轴夹角:</span>
+                                    <span class="info-value" id="vectorAngle">0°</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <button id="resetVectorBtn" class="btn secondary">
+                                <i class="fas fa-undo"></i> 重置向量
+                            </button>
+                            <button id="normalizeVectorBtn" class="btn secondary">
+                                <i class="fas fa-expand-alt"></i> 单位化
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 中法则 - 矩阵锁 -->
+            <section class="realm law-realm" id="lawRealm">
+                <div class="realm-header">
+                    <h2><i class="fas fa-cog"></i> 法则 · 矩阵变换</h2>
+                    <p class="realm-description">改变世界的数学法则 - 矩阵锁</p>
+                </div>
+                
+                <div class="realm-content">
+                    <!-- 矩阵锁容器 -->
+                    <div class="lock-container">
+                        <h3><i class="fas fa-lock"></i> 矩阵锁</h3>
+                        <div id="lockContainer" class="locks-grid">
+                            <!-- 矩阵锁将通过JavaScript动态生成 -->
+                        </div>
+                        
+                        <!-- 锁控制面板 -->
+                        <div class="lock-control-panel">
+                            <h4><i class="fas fa-gamepad"></i> 锁操作</h4>
+                            <div class="preset-buttons">
+                                <button class="preset-btn" id="preset-identity">
+                                    <i class="fas fa-square"></i> 单位矩阵
+                                </button>
+                                <button class="preset-btn" id="preset-rotation">
+                                    <i class="fas fa-sync-alt"></i> 旋转矩阵
+                                </button>
+                                <button class="preset-btn" id="preset-scaling">
+                                    <i class="fas fa-expand-arrows-alt"></i> 缩放矩阵
+                                </button>
+                                <button class="preset-btn" id="preset-shear">
+                                    <i class="fas fa-project-diagram"></i> 剪切矩阵
+                                </button>
+                                <button class="preset-btn" id="preset-random">
+                                    <i class="fas fa-random"></i> 随机矩阵
+                                </button>
+                            </div>
+                            
+                            <div class="direct-matrix-input">
+                                <h4><i class="fas fa-keyboard"></i> 直接输入矩阵</h4>
+                                <div class="matrix-input-grid">
+                                    <input type="number" id="direct-a11" value="2" step="0.1" placeholder="a11">
+                                    <input type="number" id="direct-a12" value="1" step="0.1" placeholder="a12">
+                                    <input type="number" id="direct-a21" value="1" step="0.1" placeholder="a21">
+                                    <input type="number" id="direct-a22" value="2" step="0.1" placeholder="a22">
+                                </div>
+                                <button id="applyMatrixBtn" class="btn primary">
+                                    <i class="fas fa-check"></i> 应用矩阵
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 当前选中锁信息 -->
+                    <div class="selected-lock-info">
+                        <h4><i class="fas fa-info-circle"></i> 当前选中锁信息</h4>
+                        <div id="selectedLockInfo" class="lock-info-content">
+                            <p>请选择一个矩阵锁以查看详细信息</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 右虚界 - 理想映射 -->
+            <section class="realm ideal-realm" id="idealRealm">
+                <div class="realm-header">
+                    <h2><i class="fas fa-magic"></i> 虚界 · 理想映射</h2>
+                    <p class="realm-description">当现实符合法则时的完美形式</p>
+                </div>
+                
+                <div class="realm-content">
+                    <!-- 虚界画布 -->
+                    <div class="ideal-canvas-container">
+                        <canvas id="idealCanvas" width="400" height="400"></canvas>
+                        <div class="canvas-label">特征向量映射可视化</div>
+                    </div>
+                    
+                    <!-- 特征映射显示 -->
+                    <div class="eigen-display">
+                        <h3><i class="fas fa-bolt"></i> 特征映射</h3>
+                        
+                        <div class="equation-display">
+                            <div class="equation">
+                                <div class="equation-title">矩阵变换结果:</div>
+                                <div class="equation-content">
+                                    <span class="math">A · v</span>
+                                    <span class="equals">=</span>
+                                    <span class="result" id="avResult">[ , ]</span>
+                                </div>
+                            </div>
+                            
+                            <div class="equation eigen-equation" id="eigenEquation">
+                                <div class="equation-title">特征向量方程:</div>
+                                <div class="equation-content">
+                                    <span class="math">A · v</span>
+                                    <span class="equals">=</span>
+                                    <span class="lambda">λ</span>
+                                    <span class="math">· v</span>
+                                    <span class="equals">=</span>
+                                    <span class="result" id="lambdaV">[ , ]</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 特征值显示 -->
+                        <div class="eigenvalue-display">
+                            <h4><i class="fas fa-calculator"></i> 特征值</h4>
+                            <div class="lambda-symbol">
+                                <span class="big-lambda">λ</span>
+                                <span class="equals">=</span>
+                                <span class="lambda-value" id="lambdaValue">-</span>
+                            </div>
+                            <div class="lambda-explanation">
+                                <p>特征值 <span class="math">λ</span> 表示：</p>
+                                <ul>
+                                    <li>向量长度的缩放倍数</li>
+                                    <li><span class="math">λ > 1</span>：拉伸</li>
+                                    <li><span class="math">0 < λ < 1</span>：压缩</li>
+                                    <li><span class="math">λ < 0</span>：反向</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <!-- 成功状态 -->
+                        <div class="success-state" id="successState">
+                            <div class="celebration">
+                                <i class="fas fa-star sparkle"></i>
+                                <h3>特征向量发现！</h3>
+                                <i class="fas fa-star sparkle"></i>
+                            </div>
+                            <div class="success-message">
+                                <p><i class="fas fa-check-circle"></i> 现实与法则达成和谐！</p>
+                                <p class="lambda-result">特征值 <span class="math">λ = <span id="discoveredLambda"></span></span></p>
+                                <div class="success-actions">
+                                    <button id="celebrateBtn" class="btn success">
+                                        <i class="fas fa-music"></i> 庆祝音乐
+                                    </button>
+                                    <button id="recordEigenBtn" class="btn secondary">
+                                        <i class="fas fa-save"></i> 记录发现
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 底部信息 -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="concept-explanation">
+                    <h3><i class="fas fa-lightbulb"></i> 概念解释</h3>
+                    <p><strong>特征向量</strong>是矩阵变换后方向保持不变的向量，特征值 λ 表示其长度的缩放倍数。</p>
+                    <p>方程：<span class="math">A·v = λ·v</span></p>
+                </div>
+                
+                <div class="instructions">
+                    <h3><i class="fas fa-graduation-cap"></i> 使用说明</h3>
+                    <ol>
+                        <li>在<strong>实界</strong>中拖拽或调整向量</li>
+                        <li>在<strong>法则</strong>中选择并调整矩阵锁</li>
+                        <li>在<strong>虚界</strong>中观察向量映射</li>
+                        <li>当向量成为特征向量时，锁将打开并显示特征值</li>
+                    </ol>
+                </div>
+                
+                <div class="discovery-log">
+                    <h3><i class="fas fa-history"></i> 发现记录</h3>
+                    <div id="discoveryLog" class="log-content">
+                        <p>尚未发现特征向量...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>矩阵魔法锁实验室 &copy; 2023 | 探索数学之美</p>
+                <p class="philosophy-quote">"数学是上帝书写宇宙的文字" - 伽利略</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- JavaScript 文件 -->
+    <script src="script.js"></script>
+</body>
+</html>

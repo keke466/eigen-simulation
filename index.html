@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>特征向量探索器</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            max-width: 1400px;
+            width: 100%;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            height: 700px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .panel-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 20px;
+            color: white;
+        }
+
+        .realm-real .panel-icon {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .realm-law .panel-icon {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .realm-ideal .panel-icon {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .panel-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .panel-subtitle {
+            font-size: 14px;
+            color: #718096;
+            font-style: italic;
+            margin-top: 5px;
+        }
+
+        /* 实界 - 左侧 */
+        .vector-canvas-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #realityCanvas {
+            width: 300px;
+            height: 300px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .vector-controls {
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .vector-input-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 10px;
+        }
+
+        .vector-input-group label {
+            min-width: 40px;
+            font-weight: 500;
+        }
+
+        .vector-input-group input[type="range"] {
+            flex: 1;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .vector-input-group .value-display {
+            min-width: 40px;
+            text-align: right;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+
+        .vector-info {
+            background: linear-gradient(135deg, #f093fb10 0%, #f5576c10 100%);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .vector-info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .vector-info-item .label {
+            color: #718096;
+        }
+
+        .vector-info-item .value {
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* 法则 - 中间 */
+        .matrix-lock {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lock-frame {
+            position: relative;
+            width: 250px;
+            height: 250px;
+            border: 3px solid #667eea;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .matrix-cell {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #cbd5e0;
+            font-size: 24px;
+            font-weight: bold;
+            color: #2d3748;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .matrix-cell:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .matrix-cell input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: transparent;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #2d3748;
+            outline: none;
+        }
+
+        .lock-handle {
+            position: absolute;
+            right: -25px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .lock-handle:hover {
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .lock-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e53e3e;
+        }
+
+        .status-indicator.unlocked {
+            background: #38a169;
+            animation: pulse 2s infinite;
+        }
+
+        .preset-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .preset-btn {
+            padding: 10px;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            color: #4a5568;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .preset-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        /* 虚界 - 右侧 */
+        .ideal-canvas-container {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        #idealCanvas {
+            width: 300px;
+            height: 300px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .eigen-display {
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .equation {
+            background: linear-gradient(135deg, #f093fb10 0%, #f5576c10 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .equation-line {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px 0;
+            font-family: 'Cambria', 'Times New Roman', serif;
+        }
+
+        .matrix-symbol {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .vector-symbol {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4facfe;
+        }
+
+        .equals {
+            font-size: 20px;
+            color: #718096;
+        }
+
+        .lambda {
+            font-size: 28px;
+            color: #f5576c;
+            font-weight: bold;
+        }
+
+        .success-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
+        }
+
+        .success-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .celebration {
+            text-align: center;
+        }
+
+        .sparkle {
+            font-size: 40px;
+            margin: 10px;
+            animation: spin 2s infinite linear;
+        }
+
+        .celebration h3 {
+            color: #f5576c;
+            margin: 20px 0;
+        }
+
+        .eigenvalue-display {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #38a16910 0%, #38a16920 100%);
+            border-radius: 10px;
+        }
+
+        .lambda-symbol-large {
+            font-size: 48px;
+            color: #f5576c;
+            font-weight: bold;
+            font-family: 'Cambria', 'Times New Roman', serif;
+        }
+
+        .lambda-value {
+            font-size: 36px;
+            color: #2d3748;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        /* 动画 */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 1fr;
+                max-width: 500px;
+            }
+            
+            .panel {
+                height: auto;
+                min-height: 500px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 左侧：实界 -->
+        <div class="panel realm-real">
+            <div class="panel-header">
+                <div class="panel-icon">
+                    <i class="fas fa-hand-pointer"></i>
+                </div>
+                <div>
+                    <div class="panel-title">实界 · 现实操作</div>
+                    <div class="panel-subtitle">"在这里，您可以亲手操控向量"</div>
+                </div>
+            </div>
+            
+            <div class="vector-canvas-container">
+                <canvas id="realityCanvas"></canvas>
+                
+                <div class="vector-controls">
+                    <div class="vector-input-group">
+                        <label>X:</label>
+                        <input type="range" id="vecX" min="-100" max="100" value="30" step="1">
+                        <span class="value-display" id="vecXValue">30</span>
+                    </div>
+                    <div class="vector-input-group">
+                        <label>Y:</label>
+                        <input type="range" id="vecY" min="-100" max="100" value="40" step="1">
+                        <span class="value-display" id="vecYValue">40</span>
+                    </div>
+                    <div class="vector-input-group">
+                        <label>Z:</label>
+                        <input type="range" id="vecZ" min="-100" max="100" value="0" step="1">
+                        <span class="value-display" id="vecZValue">0</span>
+                    </div>
+                    
+                    <div class="vector-info">
+                        <div class="vector-info-item">
+                            <span class="label">向量长度:</span>
+                            <span class="value" id="vectorLength">1.00</span>
+                        </div>
+                        <div class="vector-info-item">
+                            <span class="label">与X轴夹角:</span>
+                            <span class="value" id="vectorAngle">0°</span>
+                        </div>
+                        <div class="vector-info-item">
+                            <span class="label">操作状态:</span>
+                            <span class="value" id="operationStatus">正常</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 中间：法则 -->
+        <div class="panel realm-law">
+            <div class="panel-header">
+                <div class="panel-icon">
+                    <i class="fas fa-cogs"></i>
+                </div>
+                <div>
+                    <div class="panel-title">法则 · 矩阵变换</div>
+                    <div class="panel-subtitle">"定义向量如何变化的数学法则"</div>
+                </div>
+            </div>
+            
+            <div class="matrix-lock">
+                <div class="lock-frame">
+                    <div class="matrix-grid">
+                        <div class="matrix-cell" data-row="0" data-col="0">
+                            <input type="number" id="a11" value="2" step="0.1">
+                        </div>
+                        <div class="matrix-cell" data-row="0" data-col="1">
+                            <input type="number" id="a12" value="1" step="0.1">
+                        </div>
+                        <div class="matrix-cell" data-row="1" data-col="0">
+                            <input type="number" id="a21" value="1" step="0.1">
+                        </div>
+                        <div class="matrix-cell" data-row="1" data-col="1">
+                            <input type="number" id="a22" value="2" step="0.1">
+                        </div>
+                    </div>
+                    <div class="lock-handle">
+                        <i class="fas fa-redo-alt"></i>
+                    </div>
+                </div>
+                
+                <div class="lock-status">
+                    <div class="status-indicator" id="statusIndicator"></div>
+                    <span id="statusText">等待特征向量...</span>
+                </div>
+                
+                <div class="preset-buttons">
+                    <button class="preset-btn" data-matrix="identity">单位矩阵</button>
+                    <button class="preset-btn" data-matrix="rotation">旋转矩阵</button>
+                    <button class="preset-btn" data-matrix="scaling">缩放矩阵</button>
+                    <button class="preset-btn" data-matrix="shear">剪切矩阵</button>
+                    <button class="preset-btn" data-matrix="random">随机矩阵</button>
+                    <button class="preset-btn" data-matrix="symmetric">对称矩阵</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 右侧：虚界 -->
+        <div class="panel realm-ideal">
+            <div class="panel-header">
+                <div class="panel-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div>
+                    <div class="panel-title">虚界 · 理想映射</div>
+                    <div class="panel-subtitle">"当现实符合法则时的完美形式"</div>
+                </div>
+            </div>
+            
+            <div class="ideal-canvas-container">
+                <canvas id="idealCanvas"></canvas>
+                
+                <div class="success-overlay" id="successOverlay">
+                    <div class="celebration">
+                        <div class="sparkle">✨</div>
+                        <h3>特征向量发现！</h3>
+                        <div class="sparkle">✨</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="eigen-display">
+                <div class="equation">
+                    <div class="equation-line">
+                        <span class="matrix-symbol">A</span>
+                        <span class="equals">·</span>
+                        <span class="vector-symbol">v</span>
+                        <span class="equals">=</span>
+                        <span id="avResult">[ , ]</span>
+                    </div>
+                    <div class="equation-line">
+                        <span class="matrix-symbol">A</span>
+                        <span class="equals">·</span>
+                        <span class="vector-symbol">v</span>
+                        <span class="equals">=</span>
+                        <span class="lambda">λ</span>
+                        <span class="equals">·</span>
+                        <span class="vector-symbol">v</span>
+                        <span class="equals">=</span>
+                        <span id="lambdaV">[ , ]</span>
+                    </div>
+                </div>
+                
+                <div class="eigenvalue-display">
+                    <div>
+                        <span class="lambda-symbol-large">λ</span>
+                        <span class="equals">=</span>
+                        <span class="lambda-value" id="lambdaValue">-</span>
+                    </div>
+                    <div style="margin-top: 10px; font-size: 14px; color: #718096;">
+                        特征值表示向量在变换中的缩放倍数
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="successSound" src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3"></audio>
+    
+    <script>
+        // ==================== 初始化 ====================
+        let currentVector = [30, 40, 0];
+        let matrix = [[2, 1], [1, 2]];
+        let isLocked = true;
+        let animationId = null;
+
+        // ==================== 初始化函数 ====================
+        function init() {
+            console.log("初始化特征向量探索器...");
+            
+            // 初始化画布
+            initCanvas();
+            
+            // 初始化事件监听
+            initEventListeners();
+            
+            // 初始绘制
+            drawVector();
+            drawIdeal();
+            
+            console.log("初始化完成，当前矩阵:", matrix);
+            console.log("当前向量:", currentVector);
+        }
+
+        // ==================== 初始化画布 ====================
+        function initCanvas() {
+            const realCanvas = document.getElementById('realityCanvas');
+            const idealCanvas = document.getElementById('idealCanvas');
+            
+            realCanvas.width = 300;
+            realCanvas.height = 300;
+            idealCanvas.width = 300;
+            idealCanvas.height = 300;
+        }
+
+        // ==================== 事件监听 ====================
+        function initEventListeners() {
+            // 向量滑块
+            document.getElementById('vecX').addEventListener('input', updateVector);
+            document.getElementById('vecY').addEventListener('input', updateVector);
+            document.getElementById('vecZ').addEventListener('input', updateVector);
+            
+            // 矩阵输入
+            document.getElementById('a11').addEventListener('change', updateMatrix);
+            document.getElementById('a12').addEventListener('change', updateMatrix);
+            document.getElementById('a21').addEventListener('change', updateMatrix);
+            document.getElementById('a22').addEventListener('change', updateMatrix);
+            
+            // 预设按钮
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    setPresetMatrix(btn.dataset.matrix);
+                });
+            });
+            
+            // 锁把手
+            document.querySelector('.lock-handle').addEventListener('click', rotateMatrix);
+            
+            // 鼠标在实界画布上的交互
+            const realCanvas = document.getElementById('realityCanvas');
+            realCanvas.addEventListener('mousedown', startVectorDrag);
+        }
+
+        // ==================== 向量更新 ====================
+        function updateVector() {
+            // 从滑块获取值
+            currentVector = [
+                parseInt(document.getElementById('vecX').value),
+                parseInt(document.getElementById('vecY').value),
+                parseInt(document.getElementById('vecZ').value)
+            ];
+            
+            // 更新显示值
+            document.getElementById('vecXValue').textContent = currentVector[0];
+            document.getElementById('vecYValue').textContent = currentVector[1];
+            document.getElementById('vecZValue').textContent = currentVector[2];
+            
+            // 更新向量信息
+            updateVectorInfo();
+            
+            // 重新绘制
+            drawVector();
+            drawIdeal();
+            
+            // 检查是否是特征向量
+            checkForEigenvector();
+        }
+
+        function updateVectorInfo() {
+            // 计算向量长度
+            const x = currentVector[0];
+            const y = currentVector[1];
+            const length = Math.sqrt(x * x + y * y);
+            document.getElementById('vectorLength').textContent = length.toFixed(2);
+            
+            // 计算角度
+            const angle = Math.atan2(y, x) * 180 / Math.PI;
+            document.getElementById('vectorAngle').textContent = angle.toFixed(1) + '°';
+            
+            // 更新操作状态
+            const status = length > 0 ? "正常" : "零向量";
+            document.getElementById('operationStatus').textContent = status;
+        }
+
+        // ==================== 矩阵更新 ====================
+        function updateMatrix() {
+            matrix = [
+                [parseFloat(document.getElementById('a11').value) || 0,
+                 parseFloat(document.getElementById('a12').value) || 0],
+                [parseFloat(document.getElementById('a21').value) || 0,
+                 parseFloat(document.getElementById('a22').value) || 0]
+            ];
+            
+            console.log("矩阵已更新:", matrix);
+            
+            // 重新锁定（因为矩阵变了）
+            lock();
+            
+            // 重新绘制
+            drawIdeal();
+            
+            // 检查是否是特征向量
+            checkForEigenvector();
+        }
+
+        function setPresetMatrix(type) {
+            const presets = {
+                identity: [[1, 0], [0, 1]],
+                rotation: [[0, -1], [1, 0]],
+                scaling: [[2, 0], [0, 1.5]],
+                shear: [[1, 0.5], [0, 1]],
+                random: [
+                    [(Math.random() * 4 - 2).toFixed(1),
+                     (Math.random() * 4 - 2).toFixed(1)],
+                    [(Math.random() * 4 - 2).toFixed(1),
+                     (Math.random() * 4 - 2).toFixed(1)]
+                ],
+                symmetric: [[2, 1], [1, 2]]
+            };
+            
+            if (presets[type]) {
+                matrix = presets[type];
+                
+                // 更新输入框
+                document.getElementById('a11').value = matrix[0][0];
+                document.getElementById('a12').value = matrix[0][1];
+                document.getElementById('a21').value = matrix[1][0];
+                document.getElementById('a22').value = matrix[1][1];
+                
+                // 锁定并重新绘制
+                lock();
+                drawIdeal();
+                checkForEigenvector();
+                
+                console.log(`已设置为${type}矩阵:`, matrix);
+            }
+        }
+
+        function rotateMatrix() {
+            // 旋转矩阵90度
+            const rotated = [
+                [-matrix[0][1], matrix[0][0]],
+                [-matrix[1][1], matrix[1][0]]
+            ];
+            
+            matrix = rotated;
+            
+            // 更新输入框
+            document.getElementById('a11').value = matrix[0][0].toFixed(1);
+            document.getElementById('a12').value = matrix[0][1].toFixed(1);
+            document.getElementById('a21').value = matrix[1][0].toFixed(1);
+            document.getElementById('a22').value = matrix[1][1].toFixed(1);
+            
+            // 添加旋转动画
+            const handle = document.querySelector('.lock-handle');
+            handle.style.transform = 'translateY(-50%) rotate(90deg)';
+            setTimeout(() => {
+                handle.style.transform = 'translateY(-50%)';
+            }, 300);
+            
+            // 锁定并重新绘制
+            lock();
+            drawIdeal();
+            checkForEigenvector();
+            
+            console.log("矩阵已旋转:", matrix);
+        }
+
+        // ==================== 特征向量检测 ====================
+        function checkForEigenvector() {
+            // 获取二维向量（忽略Z分量）
+            const v = [currentVector[0], currentVector[1]];
+            
+            // 计算 Av
+            const Av = [
+                matrix[0][0] * v[0] + matrix[0][1] * v[1],
+                matrix[1][0] * v[0] + matrix[1][1] * v[1]
+            ];
+            
+            // 更新结果显示
+            document.getElementById('avResult').textContent = 
+                `[${Av[0].toFixed(1)}, ${Av[1].toFixed(1)}]`;
+            
+            // 检查是否共线
+            const isEigen = areVectorsCollinear(v, Av);
+            
+            if (isEigen) {
+                // 计算特征值
+                const lambda = calculateEigenvalue(v, Av);
+                
+                // 解锁
+                unlock();
+                
+                // 显示特征值
+                document.getElementById('lambdaValue').textContent = lambda.toFixed(2);
+                document.getElementById('lambdaV').textContent = 
+                    `[${(lambda * v[0]).toFixed(1)}, ${(lambda * v[1]).toFixed(1)}]`;
+                
+                // 显示成功动画
+                showSuccessAnimation();
+                
+                console.log("发现特征向量! λ =", lambda);
+                return { isEigenvector: true, eigenvalue: lambda };
+            } else {
+                // 重新锁定
+                lock();
+                
+                // 清除特征值显示
+                document.getElementById('lambdaValue').textContent = '-';
+                document.getElementById('lambdaV').textContent = '[ , ]';
+                
+                return { isEigenvector: false, eigenvalue: null };
+            }
+        }
+
+        function areVectorsCollinear(v1, v2, tolerance = 0.05) {
+            // 排除零向量
+            const mag1 = Math.sqrt(v1[0]*v1[0] + v1[1]*v1[1]);
+            const mag2 = Math.sqrt(v2[0]*v2[0] + v2[1]*v2[1]);
+            
+            if (mag1 < 0.001 || mag2 < 0.001) return false;
+            
+            // 计算归一化点积
+            const dot = v1[0]*v2[0] + v1[1]*v2[1];
+            const cosTheta = dot / (mag1 * mag2);
+            
+            // 如果cosθ接近1或-1，则向量共线
+            return Math.abs(Math.abs(cosTheta) - 1) < tolerance;
+        }
+
+        function calculateEigenvalue(v, Av) {
+            // 使用第一个非零分量
+            if (Math.abs(v[0]) > 0.001) {
+                return Av[0] / v[0];
+            } else if (Math.abs(v[1]) > 0.001) {
+                return Av[1] / v[1];
+            }
+            return 0;
+        }
+
+        // ==================== 锁状态管理 ====================
+        function unlock() {
+            if (isLocked) {
+                isLocked = false;
+                const indicator = document.getElementById('statusIndicator');
+                const statusText = document.getElementById('statusText');
+                
+                indicator.classList.add('unlocked');
+                statusText.textContent = '特征向量已发现！';
+                
+                // 播放成功声音
+                playSuccessSound();
+                
+                console.log("锁已解锁！");
+            }
+        }
+
+        function lock() {
+            if (!isLocked) {
+                isLocked = true;
+                const indicator = document.getElementById('statusIndicator');
+                const statusText = document.getElementById('statusText');
+                
+                indicator.classList.remove('unlocked');
+                statusText.textContent = '等待特征向量...';
+                
+                // 隐藏成功动画
+                hideSuccessAnimation();
+                
+                console.log("锁已锁定");
+            }
+        }
+
+        // ==================== 绘图函数 ====================
+        function drawVector() {
+            const canvas = document.getElementById('realityCanvas');
+            const ctx = canvas.getContext('2d');
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            
+            // 清空画布
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 绘制网格
+            drawGrid(ctx, canvas);
+            
+            // 绘制坐标轴
+            ctx.strokeStyle = '#cbd5e0';
+            ctx.lineWidth = 1;
+            
+            // X轴
+            ctx.beginPath();
+            ctx.moveTo(0, centerY);
+            ctx.lineTo(canvas.width, centerY);
+            ctx.stroke();
+            
+            // Y轴
+            ctx.beginPath();
+            ctx.moveTo(centerX, 0);
+            ctx.lineTo(centerX, canvas.height);
+            ctx.stroke();
+            
+            // 计算缩放
+            const maxVal = Math.max(Math.abs(currentVector[0]), Math.abs(currentVector[1]));
+            const scale = maxVal > 0 ? Math.min(centerX, centerY) * 0.8 / maxVal : 1;
+            
+            // 绘制向量
+            const x = centerX + currentVector[0] * scale;
+            const y = centerY - currentVector[1] * scale;
+            
+            // 向量线
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(x, y);
+            ctx.strokeStyle = '#4facfe';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            // 向量终点
+            ctx.beginPath();
+            ctx.arc(x, y, 8, 0, Math.PI * 2);
+            ctx.fillStyle = '#4facfe';
+            ctx.fill();
+            
+            // 标签
+            ctx.fillStyle = '#2d3748';
+            ctx.font = '14px Arial';
+            ctx.fillText(`v(${currentVector[0]}, ${currentVector[1]})`, x + 10, y - 10);
+        }
+
+        function drawIdeal() {
+            const canvas = document.getElementById('idealCanvas');
+            const ctx = canvas.getContext('2d');
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            
+            // 清空画布
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 绘制网格
+            drawGrid(ctx, canvas);
+            
+            // 绘制坐标轴
+            ctx.strokeStyle = '#cbd5e0';
+            ctx.lineWidth = 1;
+            
+            ctx.beginPath();
+            ctx.moveTo(0, centerY);
+            ctx.lineTo(canvas.width, centerY);
+            ctx.moveTo(centerX, 0);
+            ctx.lineTo(centerX, canvas.height);
+            ctx.stroke();
+            
+            // 计算 Av
+            const v = [currentVector[0], currentVector[1]];
+            const Av = [
+                matrix[0][0] * v[0] + matrix[0][1] * v[1],
+                matrix[1][0] * v[0] + matrix[1][1] * v[1]
+            ];
+            
+            // 计算缩放
+            const vectors = [v, Av];
+            let maxVal = 0;
+            vectors.forEach(vec => {
+                maxVal = Math.max(maxVal, Math.abs(vec[0]), Math.abs(vec[1]));
+            });
+            const scale = maxVal > 0 ? Math.min(centerX, centerY) * 0.7 / maxVal : 1;
+            
+            // 绘制原始向量 (v)
+            const x1 = centerX + v[0] * scale;
+            const y1 = centerY - v[1] * scale;
+            
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(x1, y1);
+            ctx.strokeStyle = '#4facfe';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.arc(x1, y1, 6, 0, Math.PI * 2);
+            ctx.fillStyle = '#4facfe';
+            ctx.fill();
+            
+            // 绘制变换后的向量 (Av)
+            const x2 = centerX + Av[0] * scale;
+            const y2 = centerY - Av[1] * scale;
+            
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(x2, y2);
+            ctx.strokeStyle = isLocked ? '#f5576c' : '#38a169';
+            ctx.lineWidth = 3;
+            ctx.setLineDash(isLocked ? [] : [5, 5]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            ctx.beginPath();
+            ctx.arc(x2, y2, 6, 0, Math.PI * 2);
+            ctx.fillStyle = isLocked ? '#f5576c' : '#38a169';
+            ctx.fill();
+            
+            // 标签
+            ctx.fillStyle = '#2d3748';
+            ctx.font = '14px Arial';
+            ctx.fillText('v', x1 + 10, y1 - 10);
+            ctx.fillText('Av', x2 + 10, y2 - 10);
+            
+            // 如果是特征向量，绘制λ符号
+            if (!isLocked) {
+                const lambda = calculateEigenvalue(v, Av);
+                ctx.fillStyle = '#f5576c';
+                ctx.font = 'bold 24px Cambria';
+                ctx.fillText(`λ = ${lambda.toFixed(2)}`, centerX - 40, centerY + 120);
+            }
+        }
+
+        function drawGrid(ctx, canvas) {
+            ctx.strokeStyle = '#f0f0f0';
+            ctx.lineWidth = 0.5;
+            
+            const gridSize = 20;
+            
+            // 垂直线
+            for (let x = 0; x <= canvas.width; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            
+            // 水平线
+            for (let y = 0; y <= canvas.height; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+        }
+
+        // ==================== 动画和音效 ====================
+        function showSuccessAnimation() {
+            const overlay = document.getElementById('successOverlay');
+            overlay.classList.add('active');
+            
+            // 自动隐藏动画
+            setTimeout(() => {
+                overlay.classList.remove('active');
+            }, 3000);
+        }
+
+        function hideSuccessAnimation() {
+            const overlay = document.getElementById('successOverlay');
+            overlay.classList.remove('active');
+        }
+
+        function playSuccessSound() {
+            const audio = document.getElementById('successSound');
+            audio.currentTime = 0;
+            audio.play().catch(e => console.log("音频播放失败:", e));
+        }
+
+        // ==================== 鼠标交互 ====================
+        function startVectorDrag(e) {
+            const canvas = document.getElementById('realityCanvas');
+            const rect = canvas.getBoundingClientRect();
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            
+            // 计算点击位置相对于中心
+            const clickX = e.clientX - rect.left - centerX;
+            const clickY = centerY - (e.clientY - rect.top);
+            
+            // 检查是否点击在向量终点附近
+            const maxVal = Math.max(Math.abs(currentVector[0]), Math.abs(currentVector[1]));
+            const scale = maxVal > 0 ? Math.min(centerX, centerY) * 0.8 / maxVal : 1;
+            
+            const vectorEndX = currentVector[0] * scale;
+            const vectorEndY = currentVector[1] * scale;
+            
+            const distance = Math.sqrt(
+                Math.pow(clickX - vectorEndX, 2) + 
+                Math.pow(clickY - vectorEndY, 2)
+            );
+            
+            if (distance < 20) {
+                // 开始拖拽
+                document.addEventListener('mousemove', onVectorDrag);
+                document.addEventListener('mouseup', stopVectorDrag);
+            }
+        }
+
+        function onVectorDrag(e) {
+            const canvas = document.getElementById('realityCanvas');
+            const rect = canvas.getBoundingClientRect();
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            
+            // 计算新的向量位置
+            const newX = e.clientX - rect.left - centerX;
+            const newY = centerY - (e.clientY - rect.top);
+            
+            // 限制范围并反算实际向量值
+            const maxScale = Math.min(centerX, centerY) * 0.8;
+            const scaledX = Math.max(-maxScale, Math.min(maxScale, newX));
+            const scaledY = Math.max(-maxScale, Math.min(maxScale, newY));
+            
+            // 更新向量值（保持比例）
+            currentVector[0] = Math.round(scaledX * 100 / maxScale);
+            currentVector[1] = Math.round(scaledY * 100 / maxScale);
+            
+            // 更新滑块
+            document.getElementById('vecX').value = currentVector[0];
+            document.getElementById('vecY').value = currentVector[1];
+            document.getElementById('vecXValue').textContent = currentVector[0];
+            document.getElementById('vecYValue').textContent = currentVector[1];
+            
+            // 更新并重绘
+            updateVectorInfo();
+            drawVector();
+            drawIdeal();
+            checkForEigenvector();
+        }
+
+        function stopVectorDrag() {
+            document.removeEventListener('mousemove', onVectorDrag);
+            document.removeEventListener('mouseup', stopVectorDrag);
+        }
+
+        // ==================== 页面加载完成 ====================
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
